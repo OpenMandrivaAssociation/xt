@@ -1,58 +1,52 @@
-%define gcj_support	1
-%define base_name	xt
-%define name		%{base_name}
-%define version		20051206
-%define release		%mkrel 1
-%define	section		free
+%define section            free
+%define gcj_support        1
 
-Name:		%{name}
-Version:	%{version}
-Release:	%{release}
-Epoch:		0
-Summary:	A fast, free implementation of XSLT in Java
-License:	BSD style
-Group:		Development/Java
-Source0:	http://www.blnz.com/xt/xt-20051206-src.tar.bz2
-Source1:	xt-build.xml
-Patch0:		xt-20050823-build.patch.bz2
-Url:		http://www.blnz.com/xt/index.html
-Requires:	servletapi5
-Requires:	xerces-j2
-Requires:	xml-commons-apis
-BuildRequires:	ant
-BuildRequires:	java-devel
-BuildRequires:	jpackage-utils >= 0:1.5
-BuildRequires:	servletapi5
-BuildRequires:	xerces-j2
-BuildRequires:	xml-commons-apis
+Name:           xt
+Version:        20051206
+Release:        %mkrel 1.1
+Epoch:          0
+Summary:        Fast, free implementation of XSLT in Java
+License:        BSD-style
+Group:          Development/Java
+Source0:        http://www.blnz.com/xt/xt-20051206-src.tar.bz2
+Source1:        xt-build.xml
+Patch0:         xt-20050823-build.patch
+Url:            http://www.blnz.com/xt/index.html
+Requires:       servletapi5
+Requires:       xerces-j2
+Requires:       xml-commons-apis
+BuildRequires:  ant
+BuildRequires:  jpackage-utils >= 0:1.5
+BuildRequires:  servletapi5
+BuildRequires:  xerces-j2
+BuildRequires:  xml-commons-apis
 %if %{gcj_support}
-Requires(post):	java-gcj-compat
+Requires(post): java-gcj-compat
 Requires(postun): java-gcj-compat
 BuildRequires:  java-gcj-compat-devel
 %else
-BuildArch:	noarch
+BuildRequires:    java-devel
+BuildArch:        noarch
 %endif
-BuildRoot:	%{_tmppath}/%{name}-%{version}-buildroot
-#Distribution:	JPackage
-#Vendor:		JPackage Project
-Obsoletes:	xt-dash
-Provides:	xt-dash
+Obsoletes:        xt-dash < %{version}
+Provides:         xt-dash = %{version}
+BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root
 
 %description
 XT is an implementation in Java of XSL Transformations.
 
 %package javadoc
-Summary:	Javadoc for %{name}
-Group:		Development/Java
+Summary:        Javadoc for %{name}
+Group:          Development/Java
 
 %description javadoc
 Javadoc for %{name}.
 
 %if 0
 %package demo
-Summary:	Demo for %{name}
-Requires:	%{name} = %{version}-%{release}
-Group:		Development/Java
+Summary:        Demo for %{name}
+Requires:       %{name} = %{epoch}:%{version}-%{release}
+Group:          Development/Java
 
 %description demo
 Demonstrations and samples for %{name}.
@@ -60,70 +54,72 @@ Demonstrations and samples for %{name}.
 
 %prep
 %setup -q
+%{__rm} src/xt/java/com/jclark/xsl/trax/UriResolverAdapter.java
+%{__rm} src/xt/java/com/jclark/xsl/trax/TraxUtil.java
 %patch0 -p1
+
 # replace included build.xml
-install -m 644 %{SOURCE1} build.xml
+%{__cp} -a %{SOURCE1} build.xml
+%{__perl} -pi -e 's/<javac/<javac nowarn="true"/g' build.xml
 # remove all binary libs
 find . -name "*.jar" -exec rm -f {} \;
-%{__rm} -rf docs thirdparty
+%{__rm} -r docs thirdparty
+%{__perl} -pi -e 's/enum/en/g' `%{_bindir}/find . -name '*.java'`
 
 %build
 export CLASSPATH=$(build-classpath servletapi5 xerces-j2 xml-commons-apis)
-%ant jar
-%ant javadoc
+%{ant} jar javadoc
 
 %install
+%{__rm} -rf %{buildroot}
+
 # jars
-install -d -m 755 $RPM_BUILD_ROOT%{_javadir}
-install -m 644 build/lib/%{name}.jar $RPM_BUILD_ROOT%{_javadir}/%{name}-%{version}.jar
-(cd $RPM_BUILD_ROOT%{_javadir} && for jar in *-%{version}*; do ln -sf ${jar} ${jar/-%{version}/}; done)
-(cd $RPM_BUILD_ROOT%{_javadir} && ln -sf %{name}-%{version}.jar %{name}-dash.jar)
+%{__mkdir_p} %{buildroot}%{_javadir}
+%{__cp} -a build/lib/%{name}.jar %{buildroot}%{_javadir}/%{name}-%{version}.jar
+(cd %{buildroot}%{_javadir} && %{__ln_s} %{name}-%{version}.jar %{name}-dash-%{version}.jar)
+(cd %{buildroot}%{_javadir} && for jar in *-%{version}*; do %{__ln_s} ${jar} ${jar/-%{version}/}; done)
+
 # javadoc
-install -d -m 755 $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
-cp -pr build/api/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
+%{__mkdir_p} %{buildroot}%{_javadocdir}/%{name}-%{version}
+%{__cp} -a build/api/* %{buildroot}%{_javadocdir}/%{name}-%{version}
+(cd %{buildroot}%{_javadocdir} && %{__ln_s} %{name}-%{version} %{name})
+
 # data
 %if 0
-install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/%{name}
-cp -pr demo $RPM_BUILD_ROOT%{_datadir}/%{name}
+%{__mkdir_p} %{buildroot}%{_datadir}/%{name}
+%{__cp} -a demo %{buildroot}%{_datadir}/%{name}
 %endif
 
 %if %{gcj_support}
-aot-compile-rpm
+%{_bindir}/aot-compile-rpm
 %endif
 
 %{__perl} -pi -e 's/\r$//g' *.txt *.html
 
 %clean
-rm -rf $RPM_BUILD_ROOT
+%{__rm} -rf %{buildroot}
 
 %if %{gcj_support}
 %post
-%{_bindir}/rebuild-gcj-db
+%{update_gcjdb}
 
 %postun
-%{_bindir}/rebuild-gcj-db
+%{clean_gcjdb}
 %endif
-
-%post javadoc
-rm -f %{_javadocdir}/%{name}
-ln -s %{name}-%{version} %{_javadocdir}/%{name}
-
-%postun javadoc
-if [ "$1" = "0" ]; then
-    rm -f %{_javadocdir}/%{name}
-fi
 
 %files
 %defattr(0644,root,root,0755)
 %doc *.txt *.html
 %{_javadir}/*.jar
 %if %{gcj_support}
+%dir %{_libdir}/gcj/%{name}
 %attr(-,root,root) %{_libdir}/gcj/%{name}/%{name}-%{version}.jar.*
 %endif
 
 %files javadoc
 %defattr(0644,root,root,0755)
-%{_javadocdir}/%{name}-%{version}
+%doc %{_javadocdir}/%{name}-%{version}
+%doc %dir %{_javadocdir}/%{name}
 
 %if 0
 %files demo
