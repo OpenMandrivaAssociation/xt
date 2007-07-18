@@ -3,7 +3,7 @@
 
 Name:           xt
 Version:        20051206
-Release:        %mkrel 1.1
+Release:        %mkrel 1.2
 Epoch:          0
 Summary:        Fast, free implementation of XSLT in Java
 License:        BSD-style
@@ -14,12 +14,12 @@ Patch0:         xt-20050823-build.patch
 Url:            http://www.blnz.com/xt/index.html
 Requires:       servletapi5
 Requires:       xerces-j2
-Requires:       xml-commons-apis
+Requires:       xml-commons-jaxp-1.3-apis
 BuildRequires:  ant
 BuildRequires:  jpackage-utils >= 0:1.5
 BuildRequires:  servletapi5
 BuildRequires:  xerces-j2
-BuildRequires:  xml-commons-apis
+BuildRequires:  xml-commons-jaxp-1.3-apis
 %if %{gcj_support}
 Requires(post): java-gcj-compat
 Requires(postun): java-gcj-compat
@@ -67,7 +67,7 @@ find . -name "*.jar" -exec rm -f {} \;
 %{__perl} -pi -e 's/enum/en/g' `%{_bindir}/find . -name '*.java'`
 
 %build
-export CLASSPATH=$(build-classpath servletapi5 xerces-j2 xml-commons-apis)
+export CLASSPATH=$(build-classpath servletapi5 xerces-j2 xml-commons-jaxp-1.3-apis)
 %{ant} jar javadoc
 
 %install
