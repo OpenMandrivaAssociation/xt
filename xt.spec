@@ -3,7 +3,7 @@
 
 Name:           xt
 Version:        20051206
-Release:        %mkrel 1.2
+Release:        %mkrel 1.3
 Epoch:          0
 Summary:        Fast, free implementation of XSLT in Java
 License:        BSD-style
@@ -21,8 +21,6 @@ BuildRequires:  servletapi5
 BuildRequires:  xerces-j2
 BuildRequires:  xml-commons-jaxp-1.3-apis
 %if %{gcj_support}
-Requires(post): java-gcj-compat
-Requires(postun): java-gcj-compat
 BuildRequires:  java-gcj-compat-devel
 %else
 BuildRequires:    java-devel
