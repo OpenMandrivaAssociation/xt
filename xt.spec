@@ -28,6 +28,7 @@ BuildArch:        noarch
 %endif
 Obsoletes:        xt-dash < %{version}
 Provides:         xt-dash = %{version}
+BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root
 
 %description
 XT is an implementation in Java of XSL Transformations.
