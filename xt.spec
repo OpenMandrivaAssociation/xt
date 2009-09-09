@@ -3,7 +3,7 @@
 
 Name:           xt
 Version:        20051206
-Release:        %mkrel 1.4
+Release:        %mkrel 1.5
 Epoch:          0
 Summary:        Fast, free implementation of XSLT in Java
 License:        BSD-style
