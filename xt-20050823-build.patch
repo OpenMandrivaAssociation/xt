@@ -1,0 +1,10 @@
+--- xt-20050823/src/xt/java/com/jclark/xsl/trax/TransformerFactoryImpl.java.orig	2005-09-17 22:33:01.000000000 +0200
++++ xt-20050823/src/xt/java/com/jclark/xsl/trax/TransformerFactoryImpl.java	2005-09-17 22:38:23.000000000 +0200
+@@ -430,4 +430,7 @@
+         }
+     }
+     
++    public void setFeature(String name, boolean value) throws TransformerConfigurationException {
++
++    }
+ }
