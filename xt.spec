@@ -11,7 +11,7 @@ Group:          Development/Java
 Source0:        http://www.blnz.com/xt/xt-20051206-src.tar.bz2
 Source1:        xt-build.xml
 Patch0:         xt-20050823-build.patch
-Url:            http://www.blnz.com/xt/index.html
+Url:            https://www.blnz.com/xt/index.html
 Requires:       servletapi5
 Requires:       xerces-j2
 Requires:       xml-commons-jaxp-1.3-apis
